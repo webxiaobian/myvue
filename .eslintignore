@@ -1,0 +1,8 @@
+  
+build/*.js
+src/assets
+public
+dist
+package-lock.json
+vue.config.json
+dll
