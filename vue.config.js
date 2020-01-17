@@ -4,6 +4,8 @@ const webpack = require('webpack')
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin')
 const InlineSourcePlugin = require('html-webpack-inline-source-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
+const CompressionPlugin = require('compression-webpack-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 module.exports = {
   publicPath: '/',
   outputDir: 'dist',
@@ -52,6 +54,12 @@ module.exports = {
       .use(InlineSourcePlugin)
       .after('html')
       .end()
+      .plugin('CompressionPlugin')
+      .use(CompressionPlugin)
+      .end()
+      .plugin('BundleAnalyzerPlugin')
+      .use(BundleAnalyzerPlugin)
+      .end()
     chainWebpack
       .when(process.env.NODE_ENV === 'development',
         (config) => config
@@ -68,6 +76,7 @@ module.exports = {
           }])
           .end()
       )
+    // chainWebpack.plugin('workbox').end()
     chainWebpack.module
       .rule('vue')
       .use('vue-loader')
@@ -77,7 +86,6 @@ module.exports = {
         return options
       })
       .end()
-
     chainWebpack
       // https://webpack.js.org/configuration/devtool/#development
       .when(process.env.NODE_ENV === 'development',
@@ -108,5 +116,20 @@ module.exports = {
         }
       })
     chainWebpack.optimization.runtimeChunk('single')
+  },
+  pwa: {
+    name: 'My App',
+    themeColor: '#4DBA87',
+    msTileColor: '#000000',
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black',
+
+    // configure the workbox plugin
+    workboxPluginMode: 'InjectManifest',
+    workboxOptions: {
+      // swSrc is required in InjectManifest mode.
+      swSrc: 'service-worker.js'
+      // ...other Workbox options...
+    }
   }
 }
